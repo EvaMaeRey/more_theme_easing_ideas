@@ -593,11 +593,14 @@ rect_elements_type_functions$function_col %>%
 ``` r
 source("R/text_elements_functions.R") # 30 proposed functions to adjust text.
 source("R/line_elements_functions.R") # 29 proposed functions to adjust line elements
-source("R/rect_elements_functions.R") # 7 proposed functions to adjsut rect elements
+source("R/rect_elements_functions.R") # 7 proposed functions to adjust rect elements
 
 g +  
-  theme_axis_text_y_left(angle = 30) + 
-  theme_axis_text_x(angle = 50, hjust = 1) + 
+  theme_axis_text_y_left(angle = 30, color = "red") +
+  # theme_axis_text_x(angle = 50, hjust = 1) + 
+  theme(axis.text.x = element_text(angle = 50, hjust = 1)) +
+  # theme_text(color = "blue") + 
+  theme(text = element_text(color = "blue")) + 
   theme_title(face = "bold.italic", lineheight = 1.5) + 
   theme_axis_line_x(colour = "darkred", 
                     linetype = "dashed", 
@@ -695,3 +698,11 @@ g +
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+
+g  + 
+  theme(legend.box.spacing = unit(2, "cm"))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
