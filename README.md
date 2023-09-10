@@ -1,6 +1,6 @@
 
-  - [Got to love love base ggplot2’s fine-tune theming
-    capabilities\!](#got-to-love-love-base-ggplot2s-fine-tune-theming-capabilities)
+  - [Got to love base ggplot2’s fine-tune theming
+    capabilities\!](#got-to-love-base-ggplot2s-fine-tune-theming-capabilities)
   - [yet… it feels kinda hard](#yet-it-feels-kinda-hard)
   - [Recognizing this, strategies
     exist](#recognizing-this-strategies-exist)
@@ -8,51 +8,42 @@
     the theme arguments). Write wrappers for all 97 arguments\!
     e.g. `theme_axis_text_y_left(color =
     "plum4")`](#another-proposal---function-for-each-theme-manipulation-move-all-the-theme-arguments-write-wrappers-for-all-97-arguments-eg-theme_axis_text_y_leftcolor--plum4)
-  - [why?](#why)
-      - [IDE guidance the whole way
-        through\!](#ide-guidance-the-whole-way-through)
-      - [more succinct user-facing
-        code](#more-succinct-user-facing-code)
-  - [why not?](#why-not)
-      - [97 functions - Maintenance
-        nightmare?](#97-functions---maintenance-nightmare)
-      - [User’s might not gain an appreciation of how theming is
-        organized in base ggplot2 and maintained in a disciplined,
-        non-nightmarish
-        way.](#users-might-not-gain-an-appreciation-of-how-theming-is-organized-in-base-ggplot2-and-maintained-in-a-disciplined-non-nightmarish-way)
-  - [implementation demonstration, creating
-    `theme_axis_text_y_left()`](#implementation-demonstration-creating-theme_axis_text_y_left)
+      - [why?](#why)
+          - [IDE guidance the whole way
+            through\!](#ide-guidance-the-whole-way-through)
+          - [more succinct user-facing
+            code](#more-succinct-user-facing-code)
+      - [why not?](#why-not)
+          - [97 functions - Maintenance
+            nightmare?](#97-functions---maintenance-nightmare)
+          - [User’s might not gain an appreciation of how theming is
+            organized in base ggplot2 and maintained in a disciplined,
+            non-nightmarish
+            way.](#users-might-not-gain-an-appreciation-of-how-theming-is-organized-in-base-ggplot2-and-maintained-in-a-disciplined-non-nightmarish-way)
+      - [implementation demonstration, creating
+        `theme_axis_text_y_left()`](#implementation-demonstration-creating-theme_axis_text_y_left)
       - [some ad-hoc tests…](#some-ad-hoc-tests)
-  - [So write (and maintain) 97 functions without losing your
-    mind?](#so-write-and-maintain-97-functions-without-losing-your-mind)
-      - [categorize elements; save as csv in
-        data\_raw](#categorize-elements-save-as-csv-in-data_raw)
-      - [write function templates for each theme element
-        type](#write-function-templates-for-each-theme-element-type)
-          - [text elements template](#text-elements-template)
-          - [rect elements template](#rect-elements-template)
-      - [line elements template](#line-elements-template)
-      - [Write batches of functions, 30 for text elements, 29 for line,
-        11 for rect. unit and margin, not yet worked
-        out.](#write-batches-of-functions-30-for-text-elements-29-for-line-11-for-rect-unit-and-margin-not-yet-worked-out)
-          - [Write text element function wrappers, using
-            template](#write-text-element-function-wrappers-using-template)
-          - [Write line element function wrappers, using
-            template](#write-line-element-function-wrappers-using-template)
-          - [Write rect element function wrappers, using
-            template](#write-rect-element-function-wrappers-using-template)
-  - [trying some of this out, I liked
-    it\!](#trying-some-of-this-out-i-liked-it)
-  - [more to explore…](#more-to-explore)
-      - [margin & unit](#margin--unit)
-  - [one-offs - these thematic adjustmens don’t follow a
-    pattern.](#one-offs---these-thematic-adjustmens-dont-follow-a-pattern)
-  - [How does it contrast to
-    <https://github.com/tidyverse/ggplot2/issues/5301>?](#how-does-it-contrast-to-httpsgithubcomtidyverseggplot2issues5301)
+      - [But write (and maintain) 97 functions without losing your
+        mind?](#but-write-and-maintain-97-functions-without-losing-your-mind)
+          - [categorize elements; save as csv in
+            data\_raw](#categorize-elements-save-as-csv-in-data_raw)
+          - [write function templates for each theme element
+            type](#write-function-templates-for-each-theme-element-type)
+          - [Write batches of functions, 30 for text elements, 29 for
+            line, 11 for rect. unit and margin, not yet worked
+            out.](#write-batches-of-functions-30-for-text-elements-29-for-line-11-for-rect-unit-and-margin-not-yet-worked-out)
+          - [trying some of this out, I liked
+            it\!](#trying-some-of-this-out-i-liked-it)
+      - [more to explore…](#more-to-explore)
+          - [margin & unit](#margin--unit)
+      - [one-offs - these thematic adjustmens don’t follow a
+        pattern.](#one-offs---these-thematic-adjustmens-dont-follow-a-pattern)
+      - [How does it contrast to
+        <https://github.com/tidyverse/ggplot2/issues/5301>?](#how-does-it-contrast-to-httpsgithubcomtidyverseggplot2issues5301)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Got to love love base ggplot2’s fine-tune theming capabilities\!
+# Got to love base ggplot2’s fine-tune theming capabilities\!
 
 ``` r
 library(tidyverse)
@@ -152,9 +143,9 @@ theme(axis.text.y.left = element_text(color = "plum4"))
 theme_axis_text_y_left(color = "plum4")
 ```
 
-# why?
+## why?
 
-## IDE guidance the whole way through\!
+### IDE guidance the whole way through\!
 
 For users reliant on IDE help, (and who isn’t), theme() is quite
 unhelpful. For example the RStudio IDE will tell you all the theme
@@ -167,17 +158,17 @@ all of the arguments that are potentially changeable for the element of
 interest. The plot creator will be remind of the arguments ‘family’,
 ‘face’, ‘colour’, "angle’, ‘hjust’ etc, arguments that can be changed.
 
-## more succinct user-facing code
+### more succinct user-facing code
 
 Furthermore, the user syntax is shorter, eliminating repetition of text.
 
-# why not?
+## why not?
 
-## 97 functions - Maintenance nightmare?
+### 97 functions - Maintenance nightmare?
 
-## User’s might not gain an appreciation of how theming is organized in base ggplot2 and maintained in a disciplined, non-nightmarish way.
+### User’s might not gain an appreciation of how theming is organized in base ggplot2 and maintained in a disciplined, non-nightmarish way.
 
-# implementation demonstration, creating `theme_axis_text_y_left()`
+## implementation demonstration, creating `theme_axis_text_y_left()`
 
 ``` r
 theme_axis_text_y_left <- function(family = NULL,
@@ -270,9 +261,9 @@ g + theme(axis.text.y.left = element_text(color = "red"))
 
 ![](README_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
 
-# So write (and maintain) 97 functions without losing your mind?
+## But write (and maintain) 97 functions without losing your mind?
 
-## categorize elements; save as csv in data\_raw
+### categorize elements; save as csv in data\_raw
 
 ``` r
 elements_type <- tribble(
@@ -391,9 +382,9 @@ elements_type %>%
 #> 5 unit            12
 ```
 
-## write function templates for each theme element type
+### write function templates for each theme element type
 
-### text elements template
+#### text elements template
 
 ``` r
 text_theme_function_template <- 'theme_axis_text_y_left <- function(family = NULL,
@@ -435,7 +426,7 @@ return(theme_element)
 }'
 ```
 
-### rect elements template
+#### rect elements template
 
 ``` r
 rect_theme_function_template <- 'theme_panel_background <- function(
@@ -472,7 +463,7 @@ return(theme_element)
 }'
 ```
 
-## line elements template
+#### line elements template
 
 ``` r
 line_theme_function_template <- 'theme_axis_line_y_left <- function(
@@ -511,9 +502,9 @@ return(theme_element)
 }'
 ```
 
-## Write batches of functions, 30 for text elements, 29 for line, 11 for rect. unit and margin, not yet worked out.
+### Write batches of functions, 30 for text elements, 29 for line, 11 for rect. unit and margin, not yet worked out.
 
-### Write text element function wrappers, using template
+#### Write text element function wrappers, using template
 
 ``` r
 elements_type %>% 
@@ -577,7 +568,7 @@ text_elements_type_functions$function_col %>%
   writeLines(con = "R/text_elements_functions.R")
 ```
 
-### Write line element function wrappers, using template
+#### Write line element function wrappers, using template
 
 ``` r
 elements_type %>% 
@@ -638,7 +629,7 @@ line_elements_type_functions$function_col %>%
   writeLines(con = "R/line_elements_functions.R")
 ```
 
-### Write rect element function wrappers, using template
+#### Write rect element function wrappers, using template
 
 ``` r
 
@@ -698,7 +689,7 @@ rect_elements_type_functions$function_col %>%
   writeLines(con = "R/rect_elements_functions.R")
 ```
 
-# trying some of this out, I liked it\!
+### trying some of this out, I liked it\!
 
 ``` r
 source("R/text_elements_functions.R") # 30 proposed functions to adjust text.
@@ -741,9 +732,9 @@ dim(elements_type)
 #> [1] 97  2
 ```
 
-# more to explore…
+## more to explore…
 
-## margin & unit
+### margin & unit
 
 ``` r
 elements_type %>% 
@@ -802,7 +793,7 @@ g  +
 
 ![](README_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
 
-# one-offs - these thematic adjustmens don’t follow a pattern.
+## one-offs - these thematic adjustmens don’t follow a pattern.
 
 ``` r
 elements_type %>% 
@@ -826,4 +817,4 @@ elements_type %>%
 #> 12 strip.placement       "placement of strip with respect to axes, either \"ins…
 ```
 
-# How does it contrast to <https://github.com/tidyverse/ggplot2/issues/5301>?
+## How does it contrast to <https://github.com/tidyverse/ggplot2/issues/5301>?
