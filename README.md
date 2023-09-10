@@ -1,23 +1,58 @@
 
+  - [Got to love love base ggplot2’s fine-tune theming
+    capabilities\!](#got-to-love-love-base-ggplot2s-fine-tune-theming-capabilities)
+  - [yet… it feels kinda hard](#yet-it-feels-kinda-hard)
+  - [Recognizing this, strategies
+    exist](#recognizing-this-strategies-exist)
+  - [Another proposal - function for each theme manipulation move (all
+    the theme arguments). Write wrappers for all 97 arguments\!
+    e.g. `theme_axis_text_y_left(color =
+    "plum4")`](#another-proposal---function-for-each-theme-manipulation-move-all-the-theme-arguments-write-wrappers-for-all-97-arguments-eg-theme_axis_text_y_leftcolor--plum4)
+  - [why?](#why)
+      - [IDE guidance the whole way
+        through\!](#ide-guidance-the-whole-way-through)
+      - [more succinct user-facing
+        code](#more-succinct-user-facing-code)
+  - [why not?](#why-not)
+      - [97 functions - Maintenance
+        nightmare?](#97-functions---maintenance-nightmare)
+      - [User’s might not gain an appreciation of how theming is
+        organized in base ggplot2 and maintained in a disciplined,
+        non-nightmarish
+        way.](#users-might-not-gain-an-appreciation-of-how-theming-is-organized-in-base-ggplot2-and-maintained-in-a-disciplined-non-nightmarish-way)
+  - [implementation demonstration, creating
+    `theme_axis_text_y_left()`](#implementation-demonstration-creating-theme_axis_text_y_left)
+      - [some ad-hoc tests…](#some-ad-hoc-tests)
+  - [So write (and maintain) 97 functions without losing your
+    mind?](#so-write-and-maintain-97-functions-without-losing-your-mind)
+      - [categorize elements; save as csv in
+        data\_raw](#categorize-elements-save-as-csv-in-data_raw)
+      - [write function templates for each theme element
+        type](#write-function-templates-for-each-theme-element-type)
+          - [text elements template](#text-elements-template)
+          - [rect elements template](#rect-elements-template)
+      - [line elements template](#line-elements-template)
+      - [Write batches of functions, 30 for text elements, 29 for line,
+        11 for rect. unit and margin, not yet worked
+        out.](#write-batches-of-functions-30-for-text-elements-29-for-line-11-for-rect-unit-and-margin-not-yet-worked-out)
+          - [Write text element function wrappers, using
+            template](#write-text-element-function-wrappers-using-template)
+          - [Write line element function wrappers, using
+            template](#write-line-element-function-wrappers-using-template)
+          - [Write rect element function wrappers, using
+            template](#write-rect-element-function-wrappers-using-template)
+  - [trying some of this out, I liked
+    it\!](#trying-some-of-this-out-i-liked-it)
+  - [more to explore…](#more-to-explore)
+      - [margin & unit](#margin--unit)
+  - [one-offs - these thematic adjustmens don’t follow a
+    pattern.](#one-offs---these-thematic-adjustmens-dont-follow-a-pattern)
+  - [How does it contrast to
+    <https://github.com/tidyverse/ggplot2/issues/5301>?](#how-does-it-contrast-to-httpsgithubcomtidyverseggplot2issues5301)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# more\_theme\_easing\_ideas
-
-People have tried to make theming easier in ggplot2
-
-  - ggthemes: creating good bundled themes (also within ggplot2
-    theme\_minimal, theme\_bw etc)
-
-  - ggeasy: creating functions that match natural language
-
-  - <https://evamaerey.github.io/ggplot2_grammar_guide/themes.html>:
-    creating comprehensive resourse for consultation
-
-  - 
-
-<!-- badges: start -->
-
-<!-- badges: end -->
+# Got to love love base ggplot2’s fine-tune theming capabilities\!
 
 ``` r
 library(tidyverse)
@@ -92,16 +127,57 @@ g +
 
 ![](README_files/figure-gfm/cars-2.png)<!-- -->
 
-# proposal
+# yet… it feels kinda hard
+
+# Recognizing this, strategies exist
+
+People have tried to make theming easier in ggplot2
+
+  - ggthemes: creating good bundled themes (also within ggplot2
+    theme\_minimal, theme\_bw etc)
+  - ggeasy: creating functions that match natural language
+  - <https://evamaerey.github.io/ggplot2_grammar_guide/themes.html>:
+    creating comprehensive resource for consultation
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+# Another proposal - function for each theme manipulation move (all the theme arguments). Write wrappers for all 97 arguments\! e.g. `theme_axis_text_y_left(color = "plum4")`
 
 ``` r
 # instead of:
 theme(axis.text.y.left = element_text(color = "plum4"))
-# this?:
-theme_axis_text_y(color = "plum4")
+# rearrange to: 
+theme_axis_text_y_left(color = "plum4")
 ```
 
-# implementation demonstration w/ text element
+# why?
+
+## IDE guidance the whole way through\!
+
+For users reliant on IDE help, (and who isn’t), theme() is quite
+unhelpful. For example the RStudio IDE will tell you all the theme
+elements, but what do you do from there? Once you selected your theme
+element, e.g. you’ve got ‘theme(strip.text.y.left = )’ the IDE gives you
+no more help.
+
+By providing wrappers like theme\_strip\_text\_y\_left(), we can provide
+all of the arguments that are potentially changeable for the element of
+interest. The plot creator will be remind of the arguments ‘family’,
+‘face’, ‘colour’, "angle’, ‘hjust’ etc, arguments that can be changed.
+
+## more succinct user-facing code
+
+Furthermore, the user syntax is shorter, eliminating repetition of text.
+
+# why not?
+
+## 97 functions - Maintenance nightmare?
+
+## User’s might not gain an appreciation of how theming is organized in base ggplot2 and maintained in a disciplined, non-nightmarish way.
+
+# implementation demonstration, creating `theme_axis_text_y_left()`
 
 ``` r
 theme_axis_text_y_left <- function(family = NULL,
@@ -139,7 +215,29 @@ theme_axis_text_y_left <- function(family = NULL,
 return(theme_element)
   
 }
+```
 
+## some ad-hoc tests…
+
+``` r
+theme(axis.text.y.left = element_text(color = "red"))
+#> List of 1
+#>  $ axis.text.y.left:List of 11
+#>   ..$ family       : NULL
+#>   ..$ face         : NULL
+#>   ..$ colour       : chr "red"
+#>   ..$ size         : NULL
+#>   ..$ hjust        : NULL
+#>   ..$ vjust        : NULL
+#>   ..$ angle        : NULL
+#>   ..$ lineheight   : NULL
+#>   ..$ margin       : NULL
+#>   ..$ debug        : NULL
+#>   ..$ inherit.blank: logi FALSE
+#>   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+#>  - attr(*, "class")= chr [1:2] "theme" "gg"
+#>  - attr(*, "complete")= logi FALSE
+#>  - attr(*, "validate")= logi TRUE
 theme_axis_text_y_left(color = "red")
 #> List of 1
 #>  $ axis.text.y.left:List of 11
@@ -164,17 +262,17 @@ theme_axis_text_y_left(color = "red")
 g + theme_axis_text_y_left(color = "red")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 g + theme(axis.text.y.left = element_text(color = "red"))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
 
-# generalization
+# So write (and maintain) 97 functions without losing your mind?
 
-# categorize elements
+## categorize elements; save as csv in data\_raw
 
 ``` r
 elements_type <- tribble(
@@ -293,9 +391,9 @@ elements_type %>%
 #> 5 unit            12
 ```
 
-# write batch function
+## write function templates for each theme element type
 
-## text elements
+### text elements template
 
 ``` r
 text_theme_function_template <- 'theme_axis_text_y_left <- function(family = NULL,
@@ -335,8 +433,89 @@ text_theme_function_template <- 'theme_axis_text_y_left <- function(family = NUL
 return(theme_element)
   
 }'
+```
 
+### rect elements template
 
+``` r
+rect_theme_function_template <- 'theme_panel_background <- function(
+                                fill = NULL,
+                                  colour = NULL,
+                                  linewidth = NULL,
+                                  linetype = NULL,
+                                  color = NULL,
+                                  inherit.blank = FALSE,
+                                  size = NULL,
+                                #size = deprecated(), # Error in deprecated() : could not find function "deprecated"
+                                element_blank = FALSE){
+  
+         theme_element <- theme(panel.background = 
+                  element_rect(
+                                  fill = fill,
+                                  colour = colour,
+                                  linewidth = linewidth,
+                                  linetype = linetype,
+                                  color = color,
+                                  inherit.blank = inherit.blank,
+                                  size = size
+                                )
+         )
+
+            
+            if(element_blank){
+              theme_element <- theme(panel.background = 
+              element_blank())
+            }
+
+return(theme_element)
+  
+}'
+```
+
+## line elements template
+
+``` r
+line_theme_function_template <- 'theme_axis_line_y_left <- function(
+                              colour = NULL,
+                              linewidth = NULL,
+                                linetype = NULL,
+                                lineend = NULL,
+                                color = NULL,
+                                arrow = NULL,
+                                inherit.blank = FALSE,
+                                size = NULL,
+                                #size = deprecated(), # Error in deprecated() : could not find function "deprecated"
+                                element_blank = FALSE){
+  
+         theme_element <- theme(axis.line.y.left = 
+                  element_line(
+                                colour = colour,
+                                linewidth = linewidth,
+                                linetype = linetype,
+                                lineend = lineend,
+                                color = color,
+                                arrow = arrow,
+                                inherit.blank = inherit.blank,
+                                size = size
+                              )
+         )
+
+            
+            if(element_blank){
+              theme_element <- theme(axis.line.y.left = 
+              element_blank())
+            }
+
+return(theme_element)
+  
+}'
+```
+
+## Write batches of functions, 30 for text elements, 29 for line, 11 for rect. unit and margin, not yet worked out.
+
+### Write text element function wrappers, using template
+
+``` r
 elements_type %>% 
   filter(element_type == "text") %>% 
   mutate(element_w_underscores = 
@@ -398,45 +577,9 @@ text_elements_type_functions$function_col %>%
   writeLines(con = "R/text_elements_functions.R")
 ```
 
-## line elements
+### Write line element function wrappers, using template
 
 ``` r
-line_theme_function_template <- 'theme_axis_line_y_left <- function(
-                              colour = NULL,
-                              linewidth = NULL,
-                                linetype = NULL,
-                                lineend = NULL,
-                                color = NULL,
-                                arrow = NULL,
-                                inherit.blank = FALSE,
-                                size = NULL,
-                                #size = deprecated(), # Error in deprecated() : could not find function "deprecated"
-                                element_blank = FALSE){
-  
-         theme_element <- theme(axis.line.y.left = 
-                  element_line(
-                                colour = colour,
-                                linewidth = linewidth,
-                                linetype = linetype,
-                                lineend = lineend,
-                                color = color,
-                                arrow = arrow,
-                                inherit.blank = inherit.blank,
-                                size = size
-                              )
-         )
-
-            
-            if(element_blank){
-              theme_element <- theme(axis.line.y.left = 
-              element_blank())
-            }
-
-return(theme_element)
-  
-}'
-
-
 elements_type %>% 
   filter(element_type == "line") %>% 
   mutate(element_w_underscores = 
@@ -495,42 +638,9 @@ line_elements_type_functions$function_col %>%
   writeLines(con = "R/line_elements_functions.R")
 ```
 
-## rect elements
+### Write rect element function wrappers, using template
 
 ``` r
-rect_theme_function_template <- 'theme_panel_background <- function(
-                                fill = NULL,
-                                  colour = NULL,
-                                  linewidth = NULL,
-                                  linetype = NULL,
-                                  color = NULL,
-                                  inherit.blank = FALSE,
-                                  size = NULL,
-                                #size = deprecated(), # Error in deprecated() : could not find function "deprecated"
-                                element_blank = FALSE){
-  
-         theme_element <- theme(panel.background = 
-                  element_rect(
-                                  fill = fill,
-                                  colour = colour,
-                                  linewidth = linewidth,
-                                  linetype = linetype,
-                                  color = color,
-                                  inherit.blank = inherit.blank,
-                                  size = size
-                                )
-         )
-
-            
-            if(element_blank){
-              theme_element <- theme(panel.background = 
-              element_blank())
-            }
-
-return(theme_element)
-  
-}'
-
 
 elements_type %>% 
   filter(element_type == "rect") %>% 
@@ -588,7 +698,7 @@ rect_elements_type_functions$function_col %>%
   writeLines(con = "R/rect_elements_functions.R")
 ```
 
-# trying some of this out
+# trying some of this out, I liked it\!
 
 ``` r
 source("R/text_elements_functions.R") # 30 proposed functions to adjust text.
@@ -623,7 +733,7 @@ g +
 #> generated.
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 
@@ -675,34 +785,45 @@ elements_type %>%
 #> 2 legend.box.margin margin      
 #> 3 plot.margin       margin
 
-elements_type %>% 
-  count(element_type) %>% 
-  filter(n < 3) 
-#> # A tibble: 10 × 2
-#>    element_type                                                                n
-#>    <chr>                                                                   <int>
-#>  1 "Alignment of the plot title/subtitle and caption. The setting for plo…     2
-#>  2 "The position of the tag as a string (\"topleft\", \"top\", \"topright…     1
-#>  3 "anchor point for positioning legend inside plot (\"center\" or two-el…     1
-#>  4 "aspect ratio of the panel"                                                 1
-#>  5 "justification of each legend within the overall bounding box, when th…     1
-#>  6 "layout of items in legends (\"horizontal\" or \"vertical\")"               1
-#>  7 "option to place the panel (background, gridlines) over the data layer…     1
-#>  8 "placement of strip with respect to axes, either \"inside\" or \"outsi…     1
-#>  9 "should strip background edges and strip labels be clipped to the exte…     1
-#> 10 "the position of legends (\"none\", \"left\", \"right\", \"bottom\", \…     2
+
 
 
 g +
-  theme(legend.margin = margin(t = 1, unit='cm'))
+  theme(legend.margin = margin(t = 1, r = 1, b = 1, l = .6, unit='cm'))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 
 g  + 
-  theme(legend.box.spacing = unit(2, "cm"))
+  theme(legend.box.spacing = unit(x = 2, units = "cm"))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
+
+# one-offs - these thematic adjustmens don’t follow a pattern.
+
+``` r
+elements_type %>% 
+  group_by(element_type) %>% 
+  filter(n() < 3) 
+#> # A tibble: 12 × 2
+#> # Groups:   element_type [10]
+#>    element               element_type                                           
+#>    <chr>                 <chr>                                                  
+#>  1 aspect.ratio          "aspect ratio of the panel"                            
+#>  2 legend.text.align     "the position of legends (\"none\", \"left\", \"right\…
+#>  3 legend.position       "the position of legends (\"none\", \"left\", \"right\…
+#>  4 legend.direction      "layout of items in legends (\"horizontal\" or \"verti…
+#>  5 legend.justification  "anchor point for positioning legend inside plot (\"ce…
+#>  6 legend.box.just       "justification of each legend within the overall bound…
+#>  7 panel.ontop           "option to place the panel (background, gridlines) ove…
+#>  8 plot.title.position   "Alignment of the plot title/subtitle and caption. The…
+#>  9 plot.caption.position "Alignment of the plot title/subtitle and caption. The…
+#> 10 plot.tag.position     "The position of the tag as a string (\"topleft\", \"t…
+#> 11 strip.clip            "should strip background edges and strip labels be cli…
+#> 12 strip.placement       "placement of strip with respect to axes, either \"ins…
+```
+
+# How does it contrast to <https://github.com/tidyverse/ggplot2/issues/5301>?
