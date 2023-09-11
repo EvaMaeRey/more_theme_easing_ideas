@@ -36,10 +36,12 @@
             it\!](#trying-some-of-this-out-i-liked-it)
       - [more to explore…](#more-to-explore)
           - [margin & unit](#margin--unit)
-      - [one-offs - these thematic adjustmens don’t follow a
-        pattern.](#one-offs---these-thematic-adjustmens-dont-follow-a-pattern)
+      - [one-offs - these thematic adjustments don’t follow a
+        pattern.](#one-offs---these-thematic-adjustments-dont-follow-a-pattern)
       - [How does it contrast to
         <https://github.com/tidyverse/ggplot2/issues/5301>?](#how-does-it-contrast-to-httpsgithubcomtidyverseggplot2issues5301)
+      - [Bonus, no… maybe related to the issue.. just
+        puzzled.](#bonus-no-maybe-related-to-the-issue-just-puzzled)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -147,11 +149,12 @@ theme_axis_text_y_left(color = "plum4")
 
 ### IDE guidance the whole way through\!
 
-For users reliant on IDE help, (and who isn’t), theme() is quite
-unhelpful. For example the RStudio IDE will tell you all the theme
-elements, but what do you do from there? Once you selected your theme
-element, e.g. you’ve got ‘theme(strip.text.y.left = )’ the IDE gives you
-no more help.
+Unfortunately, theme() IDE guidance is very unhelpful. For example the
+RStudio IDE will tell you all the theme elements, but what do you do
+from there? Once you selected your theme element, e.g. you’ve got
+‘theme(strip.text.y.left = )’ the IDE is done helping out. If you know
+to type `element_text(` then you’ll get some more help, but many ggplot2
+don’t do this.
 
 By providing wrappers like theme\_strip\_text\_y\_left(), we can provide
 all of the arguments that are potentially changeable for the element of
@@ -383,6 +386,32 @@ elements_type %>%
 ```
 
 ### write function templates for each theme element type
+
+Possible pre-step: write table for which arguments are used for each
+element type.
+
+``` r
+
+adjustables <- tibble::tribble(~ argument, ~ind_text, ~ind_line, ~ind_rect, ~default, 
+"family", T, F, F, NULL,
+"face", T, F, F,NULL,
+"fill", F, F, T,NULL,
+"colour", T, T, T,NULL,
+"linewidth", F, T, F, NULL,
+"linetype", F, T, F, NULL,
+"lineend" , F, T, F, NULL,
+"arrow" , F, T, F,  NULL,
+"size", T, T, T, NULL, # oh-oh
+"hjust", T, F, F, NULL,
+"vjust ", T, F, F, NULL,
+"angle ", T, F, F, NULL,
+"lineheight" , T, F, F, NULL,
+"color", T, F, F, NULL,
+"margin", T, F, F, NULL,
+"debug", T, T, T, NULL,
+"inherit.blank", T, T, T, FALSE,
+"element_blank",  T, T, T, FALSE)
+```
 
 #### text elements template
 
@@ -724,7 +753,7 @@ g +
 #> generated.
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 
@@ -783,7 +812,7 @@ g +
   theme(legend.margin = margin(t = 1, r = 1, b = 1, l = .6, unit='cm'))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 
@@ -791,9 +820,9 @@ g  +
   theme(legend.box.spacing = unit(x = 2, units = "cm"))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
 
-## one-offs - these thematic adjustmens don’t follow a pattern.
+## one-offs - these thematic adjustments don’t follow a pattern.
 
 ``` r
 elements_type %>% 
@@ -818,3 +847,48 @@ elements_type %>%
 ```
 
 ## How does it contrast to <https://github.com/tidyverse/ggplot2/issues/5301>?
+
+## Bonus, no… maybe related to the issue.. just puzzled.
+
+I’m expecting all text and line elements to become ‘magenta’
+
+``` r
+theme_color <- function(color = "black"){
+
+  theme_get() %+replace%
+  ggplot2::theme(text = element_text(color = color)) %+replace%
+  ggplot2::theme(line = element_line(color = color)) %+replace%
+  ggplot2::theme(rect = element_rect(color = color))
+  
+  }
+  
+ggplot(mtcars) + 
+  aes(x = wt, y = mpg) +
+  geom_point()  + 
+  labs(title = "Hello") + 
+  ggplot2::theme(text = element_text(color = "magenta")) +
+  ggplot2::theme(line = element_line(color = "magenta")) + 
+  ggplot2::theme(rect = element_rect(color = "magenta")) 
+```
+
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+``` r
+
+last_plot() +  # seems like last plot should have changed line color hmmm.... 
+  ggplot2::theme(panel.grid = element_line(color = "magenta"))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+
+``` r
+
+
+ggplot(mtcars) + 
+  aes(x = wt, y = mpg) +
+  geom_point()  + 
+  labs(title = "Hello") + 
+  theme_color(color = "red")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-17-3.png)<!-- -->
