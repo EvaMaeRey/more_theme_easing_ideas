@@ -582,7 +582,7 @@ elements_type %>%
 
 ## Bonus, no...  maybe related to the issue..  just puzzled. 
 
-I'm expecting all text and line elements to become 'magenta'
+I'm expecting all text and line elements to become 'magenta'.  Just struggles and confusion.  
 
 ```{r}
 theme_color <- function(color = "black"){
